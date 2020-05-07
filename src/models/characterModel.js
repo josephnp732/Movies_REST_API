@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export const Character = new mongoose.Schema({
+export const CharacterSchema = new mongoose.Schema({
     actorid: {
         type: String,
     },

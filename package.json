@@ -1,7 +1,6 @@
 {
   "name": "Movies_REST_API-master",
   "version": "1.0.0",
-  "type": "module",
   "scripts": {
     "start": "nodemon ./index.js --exec babel-node -e js"
   },
@@ -15,6 +14,7 @@
     "babel-preset-stage-0": "^6.24.1"
   },
   "dependencies": {
+    "bcrypt": "^4.0.1",
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
     "csurf": "^1.11.0",

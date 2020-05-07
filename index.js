@@ -1,12 +1,14 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-// import cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
+import movieRoute from './src/routes/movieRoutes';
 
 var app = express();
-var PORT = 3000;
+var PORT = 3001;
 
 // load Environment Variables
 dotenv.config();
@@ -19,8 +21,11 @@ var mongoSecret = process.env.MONGO_SECRET;
 // Setup Helmet Security
 app.use(helmet());
 
+// Serve Static Files
+app.use(express.static('public'));
+
 // Setup Body Parser
-app.use(bodyParser.urlencoded({urlencoded: true}));
+app.use(bodyParser.urlencoded({urlencoded: true, extended: true}));
 app.use(bodyParser.json());
 
 // Rate Limiter
@@ -38,9 +43,29 @@ mongoose.connect(`mongodb+srv://${mongoUserName}:${mongoPassword}@testcluster-${
 });
 
 // Router
-app.route('/', (req, res) => {
-    console.log("Main Route");
+app.get('/', (req, res) => {
+    res.send(`Welcome to Movies API`);
 });
+
+// Setup JWT
+app.use((req, res, next) => {
+    if(req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
+    {
+        jwt.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', (err, decode) => {
+            if (err) {
+                req.user = undefined;
+            }
+            req.user = decode;
+            next();
+        });
+    } else {
+        req.user = undefined;
+        next();
+    }
+});
+
+// routes
+movieRoute(app);
 
 // Health Check
 app.get('/ping', (req, res) => {
