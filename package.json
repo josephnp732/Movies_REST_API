@@ -1,0 +1,28 @@
+{
+  "name": "Movies_REST_API-master",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon ./index.js --exec babel-node -e js"
+  },
+  "main": "index.js",
+  "author": "Josephnp732 <josephnp732@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cookie-parser": "^1.4.5",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "helmet": "^3.22.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.12",
+    "nodemon": "^2.0.3",
+    "passport": "^0.4.1"
+  }
+}
