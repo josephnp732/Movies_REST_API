@@ -16,14 +16,13 @@ jobs:
             - run: npm install
             - run: npm test
 
+workflows:
+  build-and-test:
+    jobs:
+      - build-and-test
+
   build-and-publish-docker-image:
     jobs:
       - docker/publish:
           image: josephnp732/movie-api
           tag: latest
-
-workflows:
-  build-and-test:
-    jobs:
-      - build-and-test
-      - build-and-publish-docker-image
