@@ -16,24 +16,14 @@ jobs:
             - run: npm install
             - run: npm test
 
-  containerize:
-    executor: docker/docker
-    steps:
-      - setup_remote_docker
-      - checkout
-      - docker/check
-      - tag: latest
-      - docker/build:
+  build-and-publish-docker-image:
+    jobs:
+      - docker/publish:
           image: josephnp732/movie-api
-      - docker/push:
-          digest-path: /tmp/digest.txt
-          image: josephnp732/movie-api
-      - run:
-          command: |
-            echo "Digest is: $(</tmp/digest.txt)"
+          tag: latest
 
 workflows:
   build-and-test:
     jobs:
       - build-and-test
-      - containerize
+      - build-and-publish-docker-image
