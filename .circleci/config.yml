@@ -22,11 +22,12 @@ jobs:
       - setup_remote_docker
       - checkout
       - docker/check
+      - tag: latest
       - docker/build:
-          image: josephnp732/movie-api:latest
+          image: josephnp732/movie-api
       - docker/push:
           digest-path: /tmp/digest.txt
-          image: josephnp732/movie-api:latest
+          image: josephnp732/movie-api
       - run:
           command: |
             echo "Digest is: $(</tmp/digest.txt)"
