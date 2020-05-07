@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Terraform files and folders
+./deployment/.terraform
+.terraform.tfstate.lock.info
+terraform.tfstate
+terraform.tfstate.backup

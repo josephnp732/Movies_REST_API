@@ -1,6 +1,10 @@
 version: 2.1
+
 orbs:
   node: circleci/node@1.1.6
+  terraform: ovotech/terraform@1.6.6
+  docker: circleci/docker@1.0.1
+
 jobs:
   build-and-test:
     executor:
@@ -11,7 +15,24 @@ jobs:
           steps:
             - run: npm install
             - run: npm test
+
+  containerize:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: josephnp732/movie-api:latest
+      - docker/push:
+          digest-path: /tmp/digest.txt
+          image: josephnp732/movie-api:latest
+      - run:
+          command: |
+            echo "Digest is: $(</tmp/digest.txt)"
+
 workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+  build-and-test:
+    jobs:
+      - build-and-test
+      - containerize
