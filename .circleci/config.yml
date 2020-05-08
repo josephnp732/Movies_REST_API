@@ -16,13 +16,23 @@ jobs:
             - run: npm install
             - run: npm test
 
-workflows:
-  build-and-test:
-    jobs:
-      - build-and-test
-
-  build-and-publish-docker-image:
-    jobs:
-      - docker/publish:
+  build-and-push:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
           image: josephnp732/movie-api
           tag: latest
+      - docker/push:
+          image: josephnp732/movie-api
+          tag: latest
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test
+      - build-and-push:
+          requires:
+            - build-and-test

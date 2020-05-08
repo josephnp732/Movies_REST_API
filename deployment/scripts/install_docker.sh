@@ -8,9 +8,7 @@ sudo apt-get -y install apache2
 sudo apt install -y docker.io
 
 #download docker image
-sudo docker pull josephnp732/aspnetapp:v1
+sudo docker pull josephnp732/movie-api:latest
 
 #start docker image
-sudo docker run --name movies-api --rm -it -p 80:3001 josephnp732/movies-api:latest
-
-
+sudo docker run --name movies-api --rm -it -p 80:3001 josephnp732/movie-api:latest
