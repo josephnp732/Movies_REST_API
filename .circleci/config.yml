@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   node: circleci/node@1.1.6
   docker: circleci/docker@1.0.1
+  cloudrun: circleci/gcp-cloud-run@1.0.2
 
 jobs:
   build-and-test:
@@ -28,6 +29,21 @@ jobs:
           image: josephnp732/movie-api
           tag: latest
 
+  build-and-deploy:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - cloudrun/init
+      - cloudrun/build:
+          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
+      - cloudrun/deploy:
+          image: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
+          platform: managed
+          region: us-east1
+          service-name: movie-service
+          unauthenticated: true
+
 workflows:
   build-and-deploy:
     jobs:
@@ -35,3 +51,6 @@ workflows:
       - build-and-push:
           requires:
             - build-and-test
+      - build-and-deploy:
+          requires:
+            - build-and-push
