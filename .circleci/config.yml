@@ -28,13 +28,6 @@ jobs:
           image: josephnp732/movie-api
           tag: latest
 
-  deploy:
-    executor: terraform/default
-    steps:
-      - checkout
-      - terraform/plan:
-          path: ../deployment/
-
 workflows:
   build-and-deploy:
     jobs:
