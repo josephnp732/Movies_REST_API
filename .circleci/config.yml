@@ -2,7 +2,6 @@ version: 2.1
 
 orbs:
   node: circleci/node@1.1.6
-  terraform: ovotech/terraform@1.6.6
   docker: circleci/docker@1.0.1
 
 jobs:
@@ -28,6 +27,13 @@ jobs:
       - docker/push:
           image: josephnp732/movie-api
           tag: latest
+
+  deploy:
+    executor: terraform/default
+    steps:
+      - checkout
+      - terraform/plan:
+          path: ../deployment/
 
 workflows:
   build-and-deploy:
