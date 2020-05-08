@@ -39,6 +39,7 @@ jobs:
           tag: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
       - cloudrun/deploy:
           image: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
+          args: '--set-env-vars=[MONGO_USERNAME=${MONGO_USERNAME},MONGO_PASSWORD=${MONGO_PASSWORD},MONGO_DB=${MONGO_DB},MONGO_SECRET=${MONGO_SECRET}]'
           platform: managed
           region: us-east1
           service-name: movie-service
