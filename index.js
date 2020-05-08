@@ -4,11 +4,12 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken'
 import rateLimit from 'express-rate-limit';
 import movieRoute from './src/routes/movieRoutes';
 
 var app = express();
-var PORT = 3001;
+var PORT = 8080;
 
 // load Environment Variables
 dotenv.config();

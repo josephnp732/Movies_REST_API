@@ -1,10 +1,8 @@
-FROM node:10.0.0-alpine
+FROM node:14-alpine
 RUN mkdir -p /code
 WORKDIR /code
 ADD . /code
-RUN npm install -g -s --no-progress yarn && \
-    yarn && \
-    yarn install && \
+RUN yarn install && \
     yarn cache clean
 CMD [ "yarn", "start" ]
-EXPOSE 3001
+EXPOSE 8080

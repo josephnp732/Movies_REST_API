@@ -1,6 +1,6 @@
-version: '1'
+version: '3.3'
 services:
   movies-api:
     image: josephnp732/movies-api:latest
     ports:
-      - "5050:3001"
+      - "3001:8080"

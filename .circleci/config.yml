@@ -1,0 +1,59 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@1.1.6
+  docker: circleci/docker@1.0.1
+  cloudrun: circleci/gcp-cloud-run@1.0.2
+
+jobs:
+  build-and-test:
+    executor:
+      name: node/default
+    steps:
+      - checkout
+      - node/with-cache:
+          steps:
+            - run: npm install
+            - run: npm test
+
+  push-to-dockerhub:
+    executor: docker/docker
+    steps:
+      - setup_remote_docker
+      - checkout
+      - docker/check
+      - docker/build:
+          image: josephnp732/movie-api
+          tag: latest
+      - docker/push:
+          image: josephnp732/movie-api
+          tag: latest
+
+  deploy:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - cloudrun/init
+      - cloudrun/build:
+          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
+      - cloudrun/deploy:
+          image: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
+          platform: managed
+          region: us-east1
+          service-name: movie-service
+          unauthenticated: true
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build-and-test
+      - push-to-dockerhub:
+          requires:
+            - build-and-test
+      - deploy:
+          requires:
+            - push-to-dockerhub
+          filters:
+            branches:
+              only: master          
