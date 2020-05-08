@@ -54,3 +54,6 @@ workflows:
       - deploy:
           requires:
             - push-to-dockerhub
+          filters:
+            branches:
+              only: master          

@@ -5,4 +5,4 @@ ADD . /code
 RUN yarn install && \
     yarn cache clean
 CMD [ "yarn", "start" ]
-EXPOSE 3001
+EXPOSE 8080
