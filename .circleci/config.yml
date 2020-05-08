@@ -16,7 +16,7 @@ jobs:
             - run: npm install
             - run: npm test
 
-  build-and-push:
+  push-to-dockerhub:
     executor: docker/docker
     steps:
       - setup_remote_docker
@@ -29,7 +29,7 @@ jobs:
           image: josephnp732/movie-api
           tag: latest
 
-  build-and-deploy:
+  deploy:
     docker:
       - image: 'cimg/base:stable'
     steps:
@@ -48,9 +48,9 @@ workflows:
   build-and-deploy:
     jobs:
       - build-and-test
-      - build-and-push:
+      - push-to-dockerhub:
           requires:
             - build-and-test
-      - build-and-deploy:
+      - deploy:
           requires:
-            - build-and-push
+            - push-to-dockerhub
