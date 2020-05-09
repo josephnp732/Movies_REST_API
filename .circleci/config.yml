@@ -25,6 +25,7 @@ jobs:
       - docker/build:
           image: josephnp732/movie-api
           tag: latest
+          extra_build_args: '--build-arg MONGO_USERNAME=${MONGO_USERNAME} --build-arg MONGO_PASSWORD=${MONGO_PASSWORD} --build-arg MONGO_DB=${MONGO_DB} --build-arg MONGO_SECRET=${MONGO_SECRET}'
       - docker/push:
           image: josephnp732/movie-api
           tag: latest
@@ -39,6 +40,7 @@ jobs:
           tag: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
       - cloudrun/deploy:
           image: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api'
+          args: '--set-env-vars=[MONGO_USERNAME=${MONGO_USERNAME},MONGO_PASSWORD=${MONGO_PASSWORD},MONGO_DB=${MONGO_DB},MONGO_SECRET=${MONGO_SECRET}]'
           platform: managed
           region: us-east1
           service-name: movie-service
