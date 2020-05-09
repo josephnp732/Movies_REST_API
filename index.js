@@ -43,6 +43,9 @@ mongoose.connect(`mongodb+srv://${mongoUserName}:${mongoPassword}@testcluster-${
     useUnifiedTopology: true
 });
 
+console.log("MongoDB URL: ")
+console.log(`mongodb+srv://${mongoUserName}:${mongoPassword}@testcluster-${mongoSecret}.mongodb.net/${mongoDbName}?retryWrites=true&w=majority`);
+
 // Router
 app.get('/', (req, res) => {
     res.send(`Welcome to Movies API`);
