@@ -52,8 +52,6 @@ workflows:
           requires:
             - build-and-test
       - deploy:
-          requires:
-            - push-to-dockerhub
           filters:
             branches:
               only: master          

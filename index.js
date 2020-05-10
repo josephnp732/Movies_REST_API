@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'
 import rateLimit from 'express-rate-limit';
-import movieRoute from './src/routes/movieRoutes';
+import routes from './src/routes/routes';
 
 var app = express();
 var PORT = 8080;
@@ -66,7 +66,7 @@ app.use((req, res, next) => {
 });
 
 // routes
-movieRoute(app);
+routes(app);
 
 // Health Check
 app.get('/ping', (req, res) => {
