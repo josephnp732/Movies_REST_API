@@ -44,6 +44,21 @@ jobs:
           service-name: movie-service
           unauthenticated: true
 
+  deploy-dev:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - cloudrun/init
+      - cloudrun/build:
+          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api-dev'
+      - cloudrun/deploy:
+          image: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api-dev'
+          platform: managed
+          region: us-east1
+          service-name: movie-service-dev
+          unauthenticated: true
+
 workflows:
   build-and-deploy:
     jobs:
@@ -51,6 +66,11 @@ workflows:
       - push-to-dockerhub:
           requires:
             - build-and-test
+      - deploy-dev:
+          filters:
+            branches:
+              only:
+                - /dev-.*/   
       - deploy:
           filters:
             branches:

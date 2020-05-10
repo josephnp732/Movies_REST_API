@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken'
 import rateLimit from 'express-rate-limit';
 import routes from './src/routes/routes';
 import morgan from 'morgan';
+import { track } from 'express-jaeger';
 
 var app = express();
 var PORT = 8080;
@@ -42,6 +43,27 @@ const limiter = new rateLimit({
     max: 100, // Max Request per IP
     delayMs: 0 // disable delays
 })
+
+// Setup Jaeger API Tracing
+const tracerConfig = {
+    serviceName: process.env.JAEGER_SERVICE_NAME,
+    sampler: {
+      type: "const",
+      param: 1
+    },
+    reporter: {
+      collectorEndpoint: process.env.JAEGER_COLLECTOR_ENDPOINT,
+      agentHost: process.env.JAEGER_AGENT_HOST,
+      agentPort: process.env.JAEGER_AGENT_PORT,
+      logSpans: true
+    }
+  };
+
+
+app.use(track("/ping", null, tracerConfig));
+app.use(track("/movies/all", null, tracerConfig));
+app.use(track("/characters/all", null, tracerConfig));
+app.use(track("/actors/all", null, tracerConfig));
 
 //mongoose connection
 mongoose.Promise = global.Promise;
