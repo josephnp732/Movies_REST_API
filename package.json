@@ -24,6 +24,7 @@
     "helmet": "^3.22.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.9.12",
+    "morgan": "^1.10.0",
     "nodemon": "^2.0.3",
     "passport": "^0.4.1"
   }

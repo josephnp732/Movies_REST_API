@@ -7,12 +7,16 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'
 import rateLimit from 'express-rate-limit';
 import routes from './src/routes/routes';
+import morgan from 'morgan';
 
 var app = express();
 var PORT = 8080;
 
 // load Environment Variables
 dotenv.config();
+
+// Setup morgan logger
+app.use(morgan('combined'))
 
 var mongoUserName = process.env.MONGO_USERNAME;
 var mongoPassword = process.env.MONGO_PASSWORD;
@@ -21,6 +25,9 @@ var mongoSecret = process.env.MONGO_SECRET;
 
 // Setup Helmet Security
 app.use(helmet());
+
+// Setup Cookie Parser
+app.use(cookieParser());
 
 // Serve Static Files
 app.use(express.static('public'));
