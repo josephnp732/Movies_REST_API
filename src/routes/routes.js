@@ -2,7 +2,8 @@ import { getAllMovies, getMoviesByActor } from "../controllers/movieController";
 import { getAllActors, getActorsbyMovie } from "../controllers/actorController";
 import { getAllCharacters } from "../controllers/characterController";
 import { login, register, loginRequired } from "../controllers/userController";
-import { tracerConfig } from "../../index"
+import { actorByMoviesSchema, moviesByActorSchema } from '../schemas/schemas';
+
 
 // Funtion to get All data of all APIs
 const routes = (app) => {

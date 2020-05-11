@@ -9,9 +9,10 @@ import rateLimit from 'express-rate-limit';
 import routes from './src/routes/routes';
 import morgan from 'morgan';
 import { track } from 'express-jaeger';
+import * as Sentry from '@sentry/node';
 
 var app = express();
-var PORT = 8080;
+var PORT = 3001;
 
 // load Environment Variables
 dotenv.config();
@@ -45,7 +46,7 @@ const limiter = new rateLimit({
 })
 
 // Setup Jaeger API Tracing
-const tracerConfig = {
+const TracerConfig = {
     serviceName: process.env.JAEGER_SERVICE_NAME,
     sampler: {
       type: "const",
@@ -59,11 +60,16 @@ const tracerConfig = {
     }
   };
 
+app.use(track("/ping", null, TracerConfig));
+app.use(track("/movies/all", null, TracerConfig));
+app.use(track("/characters/all", null, TracerConfig));
+app.use(track("/actors/all", null, TracerConfig));
 
-app.use(track("/ping", null, tracerConfig));
-app.use(track("/movies/all", null, tracerConfig));
-app.use(track("/characters/all", null, tracerConfig));
-app.use(track("/actors/all", null, tracerConfig));
+// Setup Sentry.io Middleware
+var sentryDNS = process.env.SENTRY_DNS;
+Sentry.init({ dsn: sentryDNS});
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.errorHandler());
 
 //mongoose connection
 mongoose.Promise = global.Promise;

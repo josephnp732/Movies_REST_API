@@ -1,11 +1,17 @@
 import mongoose from 'mongoose';
+import Ajv from 'ajv';
+
 import { MovieSchema } from '../models/movieModel';
 import { ActorSchema } from '../models/actorModel';
 import { CharacterSchema } from '../models/characterModel';
+import { moviesByActorSchema } from '../schemas/schemas';
 
 var Movie = mongoose.model('Movie', MovieSchema);
-var Actor = mongoose.model('Actor', ActorSchema)
-var Character = mongoose.model('Character', CharacterSchema)
+var Actor = mongoose.model('Actor', ActorSchema);
+var Character = mongoose.model('Character', CharacterSchema);
+
+const ajv = new Ajv({allErrors: true});
+const validateBody = ajv.compile(moviesByActorSchema);
 
 // Get all Movies from DB
 export const getAllMovies = (req, res, next) => {
@@ -21,9 +27,16 @@ export const getAllMovies = (req, res, next) => {
 
 // POST: { "name": "actor_name" }
 export const getMoviesByActor = (req, res, next) => {
-    var name = req.body.name;
 
-    Actor.find({"name": {$regex: name, $options:'i'}}, (err, actor) => {
+    // validate request
+    var validate = validateBody(req.body);
+    if(!validate) {
+        res.status(400);
+        res.send(ajv.errorsText(validateBody.errors));
+        return;
+    };
+
+    Actor.find({"name": {$regex: req.body.name, $options:'i'}}, (err, actor) => {
         if(err) {
             res.status(500);
             res.send("Internal Server Error. (Actors Error) Please try again later after sometime");

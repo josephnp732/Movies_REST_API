@@ -67,6 +67,8 @@ workflows:
           requires:
             - build-and-test
       - deploy-dev:
+          requires:
+            - build-and-test
           filters:
             branches:
               only:
