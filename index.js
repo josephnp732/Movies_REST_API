@@ -11,11 +11,11 @@ import morgan from 'morgan';
 import { track } from 'express-jaeger';
 import * as Sentry from '@sentry/node';
 
-var app = express();
-var PORT = 3001;
-
 // load Environment Variables
 dotenv.config();
+
+var app = express();
+var PORT = process.env.APP_PORT;
 
 // Setup morgan logger
 app.use(morgan('combined'))
