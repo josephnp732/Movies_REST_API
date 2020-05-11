@@ -1,17 +1,14 @@
 import mongoose from 'mongoose';
-import Ajv from 'ajv';
 
 import { MovieSchema } from '../models/movieModel';
 import { ActorSchema } from '../models/actorModel';
 import { CharacterSchema } from '../models/characterModel';
 import { actorByMoviesSchema } from '../schemas/schemas';
+import validateRequest from './validator/schemaValidator';
 
 var Movie = mongoose.model('Movie', MovieSchema);
 var Actor = mongoose.model('Actor', ActorSchema)
 var Character = mongoose.model('Character', CharacterSchema);
-
-const ajv = new Ajv({allErrors: true});
-const validateBody = ajv.compile(actorByMoviesSchema);
 
 // Get all Movies from DB
 export const getAllActors = (req, res, next) => {
@@ -29,13 +26,9 @@ export const getAllActors = (req, res, next) => {
 // POST: { "movieTitle": "movie_title" }
 export const getActorsbyMovie = (req, res, next) => { 
 
-    // validate request
-    var validate = validateBody(req.body);
-    if(!validate) {
-        res.status(400);
-        res.send(ajv.errorsText(validateBody.errors));
+    if(!validateRequest(req, res, actorByMoviesSchema)) {
         return;
-    };
+    }
 
     Movie.find({'title': {$regex: req.body.movieTitle, $options:'i'}}, (err, movies) => {
         if(err) {
