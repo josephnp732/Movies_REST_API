@@ -23,6 +23,7 @@ jobs:
       - checkout
       - docker/check
       - docker/build:
+          extra_build_args: '--build-arg MONGO_USERNAME=${MONGO_USERNAME} --build-arg MONGO_PASSWORD=${MONGO_PASSWORD} --build-arg MONGO_SECRET=${MONGO_SECRET} --build-arg JAEGER_COLLECTOR_ENDPOINT=${JAEGER_COLLECTOR_ENDPOINT} --build-arg JAEGER_SERVICE_NAME=${JAEGER_SERVICE_NAME} --build-arg JAEGER_AGENT_HOST=${JAEGER_AGENT_HOST} --build-arg SENTRY_DNS=${SENTRY_DNS}'
           image: josephnp732/movie-api
           tag: latest
       - docker/push:
