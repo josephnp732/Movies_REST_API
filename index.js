@@ -1,6 +1,5 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -14,11 +13,11 @@ import * as Sentry from '@sentry/node';
 // load Environment Variables
 dotenv.config();
 
-var app = express();
+export const app = express();
 var PORT = process.env.APP_PORT;
 
 // Setup morgan logger
-app.use(morgan('combined'))
+app.use(morgan('combined'));
 
 var mongoUserName = process.env.MONGO_USERNAME;
 var mongoPassword = process.env.MONGO_PASSWORD;
@@ -27,9 +26,6 @@ var mongoSecret = process.env.MONGO_SECRET;
 
 // Setup Helmet Security
 app.use(helmet());
-
-// Setup Cookie Parser
-app.use(cookieParser());
 
 // Serve Static Files
 app.use(express.static('public'));
@@ -80,6 +76,7 @@ mongoose.connect(`mongodb+srv://${mongoUserName}:${mongoPassword}@testcluster-${
 
 // Router
 app.get('/', (req, res) => {
+    res.status(200);
     res.send(`Welcome to Movies API`);
 });
 
@@ -111,3 +108,5 @@ app.get('/ping', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Listening on PORT: ${PORT}`)
 });
+
+export default app;

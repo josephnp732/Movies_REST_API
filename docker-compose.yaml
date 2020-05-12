@@ -2,5 +2,17 @@ version: '3.3'
 services:
   movies-api:
     image: josephnp732/movies-api:latest
+    environment:
+      - MONGO_USERNAME=<add_value>
+      - MONGO_DB=movies_project
+      - MONGO_PASSWORD=<add_value>
+      - MONGO_SECRET=<add_value>
+      - JAEGER_COLLECTOR_ENDPOINT=<add_value>
+      - JAEGER_SERVICE_NAME=movies-api-project-local
+      - JAEGER_AGENT_HOST=<add_value>
+      - JAEGER_AGENT_PORT=6831
+      - SENTRY_DNS=<add_value>
+    stdin_open: true
+    tty: true
     ports:
       - "3001:8080"
