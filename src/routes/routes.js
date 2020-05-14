@@ -3,16 +3,20 @@ import { getAllActors, getActorsbyMovie } from "../controllers/actorController";
 import { getAllCharacters } from "../controllers/characterController";
 import { login, register, loginRequired } from "../controllers/userController";
 
+// redis-cache expiration
+export const redisExpiration = {
+  expire: 3600 // redis-cache data expires in 1 hr
+};
 
 // Funtion to get All data of all APIs
-const routes = (app) => {
+const routes = (app, redisClient) => {
 
-  movieRoutes(app);
+  movieRoutes(app, redisClient);
 
-  actorRoutes(app);
+  actorRoutes(app, redisClient);
 
   // get All Characters (Auth)
-  app.route("/characters/all").get(getAllCharacters);
+  app.route("/characters/all").get(redisClient.route(redisExpiration), getAllCharacters);
 
   // register Controller
   app.route("/auth/register").post(register);
@@ -22,20 +26,20 @@ const routes = (app) => {
 };
 
 
-const movieRoutes = (app) => {
+const movieRoutes = (app, redisClient) => {
     // get All Movies
-    app.route("/movies/all").get(getAllMovies);
+    app.route("/movies/all").get(redisClient.route(redisExpiration), getAllMovies);
 
     // get movies by actor
-    app.route("/moviesByActor").post(getMoviesByActor);
+    app.route("/moviesByActor").post(redisClient.route(redisExpiration), getMoviesByActor);
 }
 
-const actorRoutes = (app) => {
+const actorRoutes = (app, redisClient) => {
   // get All Actors
-  app.route("/actors/all").get(getAllActors);
+  app.route("/actors/all").get(redisClient.route(redisExpiration), getAllActors);
 
   // get actors by movie
-  app.route("/actorsByMovie").post(getActorsbyMovie);
+  app.route("/actorsByMovie").post(redisClient.route(redisExpiration), getActorsbyMovie);
 }
 
 export default routes;

@@ -4,7 +4,7 @@ import Ajv from 'ajv';
 import { MovieSchema } from '../models/movieModel';
 import { ActorSchema } from '../models/actorModel';
 import { CharacterSchema } from '../models/characterModel';
-import { moviesByActorSchema } from '../schemas/schemas';
+import { moviesByActorSchema } from './schemas/schemas';
 import validateRequest from './validator/schemaValidator';
 
 var Movie = mongoose.model('Movie', MovieSchema);
