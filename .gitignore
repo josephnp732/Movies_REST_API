@@ -103,6 +103,10 @@ dist
 # TernJS port file
 .tern-port
 
-# Private Key
-movies_jwt_secret
+# Terraform files
+./deployment/.terraform
+.terraform
+.terraform.tfstate.lock.info
+terraform.tfstate.backup
+terraform.tfstate
 

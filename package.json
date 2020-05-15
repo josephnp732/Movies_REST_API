@@ -2,7 +2,7 @@
   "name": "Movies_REST_API",
   "version": "1.0.0",
   "scripts": {
-    "start": "nodemon ./index.js --exec babel-node -e js"
+    "start": "nodemon ./index.js --exec babel-node -e js | pino-socket -a 134.122.14.190 -p 5000 -m tcp"
   },
   "main": "index.js",
   "author": "Josephnp732 <josephnp732@gmail.com>",
@@ -16,6 +16,7 @@
     "@babel/register": "^7.9.0"
   },
   "dependencies": {
+    "@elastic/ecs-morgan-format": "^0.2.0",
     "@sentry/node": "^5.15.5",
     "ajv": "^6.12.2",
     "bcryptjs": "^2.4.3",
@@ -32,6 +33,7 @@
     "morgan": "^1.10.0",
     "nodemon": "^2.0.3",
     "passport": "^0.4.1",
+    "pino-socket": "^2.0.0",
     "redis": "^3.0.2"
   }
 }

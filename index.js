@@ -5,11 +5,12 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import routes from './src/routes/routes';
-import morgan from 'morgan';
+import morgan, { format } from 'morgan';
 import { track } from 'express-jaeger';
 import * as Sentry from '@sentry/node';
 import redisCache from 'express-redis-cache';
 import redis from 'redis';
+const ecsFormat = require('@elastic/ecs-morgan-format')('tiny')
 
 import { jwtMiddleWare } from './src/middleware/JWT';
 import { healthCheck } from './src/routes/healthCheck';
@@ -27,7 +28,7 @@ const app = express();
 var PORT = process.env.APP_PORT;
 
 // Setup morgan logger
-app.use(morgan('combined'));
+app.use(morgan(ecsFormat, {}));
 
 // Enable strong E-Tag
 app.set('etag','strong');
@@ -62,8 +63,7 @@ const TracerConfig = {
     reporter: {
       collectorEndpoint: process.env.JAEGER_COLLECTOR_ENDPOINT,
       agentHost: process.env.JAEGER_AGENT_HOST,
-      agentPort: process.env.JAEGER_AGENT_PORT,
-      logSpans: true
+      agentPort: process.env.JAEGER_AGENT_PORT
     }
   };
 
