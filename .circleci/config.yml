@@ -56,9 +56,7 @@ jobs:
           command: |
             cd ./deployment
             terraform apply -var "do_token=${DO_PAT}" -var "pub_key=../id_rsa.pub" -var "pvt_key=../movies_jwt_secret" -var "ssh_fingerprint=${DO_SSH_FINGERPRINT}" --auto-approve
-            floatingIP=$( terraform output -json fip_output )
-            export JAEGER_AGENT_HOST=${floatingIP}
-            echo ${JAEGER_AGENT_HOST}
+            terraform output -json fip_output
       - run:
           name: show
           command: terraform show -no-color > tfresult
@@ -121,10 +119,16 @@ workflows:
       - build-and-test
       - terraform-init:
           requires:
-            - build-and-test     
+            - build-and-test
+          filters:
+            branches:
+              only: master 
       - terraform-apply:
           requires:
             - terraform-init 
+          filters:
+            branches:
+              only: master 
       - push-to-dockerhub:
           requires:
             - terraform-apply
@@ -137,7 +141,7 @@ workflows:
                 - /dev-.*/   
       - deploy:
           requires:
-            - build-and-test
+            - terraform-apply
           filters:
             branches:
               only: master          
