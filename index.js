@@ -3,29 +3,41 @@ import bodyParser from 'body-parser';
 import helmet from 'helmet';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken'
 import rateLimit from 'express-rate-limit';
 import routes from './src/routes/routes';
-import morgan from 'morgan';
+import morgan, { format } from 'morgan';
 import { track } from 'express-jaeger';
 import * as Sentry from '@sentry/node';
+import redisCache from 'express-redis-cache';
+import redis from 'redis';
+const ecsFormat = require('@elastic/ecs-morgan-format')('tiny')
+
+import { jwtMiddleWare } from './src/middleware/JWT';
+import { healthCheck } from './src/routes/healthCheck';
 
 // load Environment Variables
 dotenv.config();
-
-export const app = express();
-var PORT = process.env.APP_PORT;
-
-// Setup morgan logger
-app.use(morgan('combined'));
 
 var mongoUserName = process.env.MONGO_USERNAME;
 var mongoPassword = process.env.MONGO_PASSWORD;
 var mongoDbName = process.env.MONGO_DB;
 var mongoSecret = process.env.MONGO_SECRET;
+var redisHost = process.env.JAEGER_AGENT_HOST;  // same container as Jaeger
+
+const app = express();
+var PORT = process.env.APP_PORT;
+
+// Setup morgan logger
+app.use(morgan(ecsFormat, {}));
+
+// Enable strong E-Tag
+app.set('etag','strong');
+
+// Setup Redis-Cache Client
+var redisClient = redisCache({client: redis.createClient({host: redisHost, port: "6379"})});
 
 // Setup Helmet Security
-app.use(helmet());
+app.use(helmet({permittedCrossDomainPolicies: true}));  
 
 // Serve Static Files
 app.use(express.static('public'));
@@ -51,15 +63,16 @@ const TracerConfig = {
     reporter: {
       collectorEndpoint: process.env.JAEGER_COLLECTOR_ENDPOINT,
       agentHost: process.env.JAEGER_AGENT_HOST,
-      agentPort: process.env.JAEGER_AGENT_PORT,
-      logSpans: true
+      agentPort: process.env.JAEGER_AGENT_PORT
     }
   };
 
 app.use(track("/ping", null, TracerConfig));
 app.use(track("/movies/all", null, TracerConfig));
-app.use(track("/characters/all", null, TracerConfig));
 app.use(track("/actors/all", null, TracerConfig));
+
+// jwt middleware
+jwtMiddleWare(app);
 
 // Setup Sentry.io Middleware
 var sentryDNS = process.env.SENTRY_DNS;
@@ -74,39 +87,17 @@ mongoose.connect(`mongodb+srv://${mongoUserName}:${mongoPassword}@testcluster-${
     useUnifiedTopology: true
 });
 
-console.log("MongoDB URL: ")
-console.log(`mongodb+srv://${mongoUserName}:${mongoPassword}@testcluster-${mongoSecret}.mongodb.net/${mongoDbName}?retryWrites=true&w=majority`);
-
 // Router
 app.get('/', (req, res) => {
     res.status(200);
     res.send(`Welcome to Movies API`);
 });
 
-// Setup JWT
-app.use((req, res, next) => {
-    if(req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
-    {
-        jwt.verify(req.headers.authorization.split(' ')[1], 'RESTFULAPIs', (err, decode) => {
-            if (err) {
-                req.user = undefined;
-            }
-            req.user = decode;
-            next();
-        });
-    } else {
-        req.user = undefined;
-        next();
-    }
-});
+// Health Check
+healthCheck(app, redisClient);
 
 // routes
-routes(app);
-
-// Health Check
-app.get('/ping', (req, res) => {
-    res.json({"pong": "ok"});
-});
+routes(app, redisClient);
 
 app.listen(PORT, () => {
     console.log(`Listening on PORT: ${PORT}`)

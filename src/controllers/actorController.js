@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { MovieSchema } from '../models/movieModel';
 import { ActorSchema } from '../models/actorModel';
 import { CharacterSchema } from '../models/characterModel';
-import { actorByMoviesSchema } from '../schemas/schemas';
+import { actorByMoviesSchema } from './schemas/schemas';
 import validateRequest from './validator/schemaValidator';
 
 var Movie = mongoose.model('Movie', MovieSchema);

@@ -1,5 +1,12 @@
 version: 2.1
 
+defaults: &defaults
+  working_directory: ~/deployment
+  docker:
+    - image: gumshoe/cci-terraform:1.1.0
+  environment:
+    TF_IN_AUTOMATION: true
+
 orbs:
   node: circleci/node@1.1.6
   docker: circleci/docker@1.0.1
@@ -15,6 +22,51 @@ jobs:
           steps:
             - run: npm install
             - run: npm test
+
+  terraform-init:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          key: movies-project-{{ checksum "yarn.lock" }}
+      - run:
+          name: terraform-init
+          command: | 
+            cd ./deployment
+            terraform init -input=false
+      - persist_to_workspace:
+          root: ~/deployment
+          paths: ./deployment/*
+      - save_cache:
+          key: movies-project-{{ checksum "yarn.lock" }}
+          paths:
+            - "deployment"
+
+
+  terraform-apply:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/deployment
+      - restore_cache:
+          key: movies-project-{{ checksum "yarn.lock" }}
+      - run:
+          name: terraform-apply
+          command: |
+            cd ./deployment
+            terraform apply -var "do_token=${DO_PAT}" -var "pub_key=../id_rsa.pub" -var "pvt_key=../movies_jwt_secret" -var "ssh_fingerprint=${DO_SSH_FINGERPRINT}" --auto-approve
+            terraform output -json fip_output
+      - run:
+          name: show
+          command: terraform show -no-color > tfresult
+      - store_artifacts:
+          path: ~/deployment/tfresult
+          destination: tfresult
+      - save_cache:
+          key: movies-project-{{ checksum "yarn.lock" }}
+          paths:
+            - "deployment"
 
   push-to-dockerhub:
     executor: docker/docker
@@ -65,9 +117,21 @@ workflows:
   build-and-deploy:
     jobs:
       - build-and-test
-      - push-to-dockerhub:
+      - terraform-init:
           requires:
             - build-and-test
+          filters:
+            branches:
+              only: master 
+      - terraform-apply:
+          requires:
+            - terraform-init 
+          filters:
+            branches:
+              only: master 
+      - push-to-dockerhub:
+          requires:
+            - terraform-apply
       - deploy-dev:
           requires:
             - build-and-test
@@ -76,6 +140,8 @@ workflows:
               only:
                 - /dev-.*/   
       - deploy:
+          requires:
+            - terraform-apply
           filters:
             branches:
               only: master          

@@ -1,9 +1,15 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import {
     UserSchema
 } from '../models/userModel';
+
+// load Environment Variables
+dotenv.config();
+
+const privateKey = process.env.JWT_PRIVATE_KEY;
 
 const User = mongoose.model('User', UserSchema);
 
@@ -46,8 +52,10 @@ export const login = (req, res) => {
                     token: jwt.sign({
                         email: user.email,
                         username: user.username,
-                        _id: user.id
-                    }, 'RESTFULAPIs')
+                        _id: user.id,
+                    }, privateKey, {
+                        expiresIn: "1h"   // Token expires in 1 hr
+                    })
                 });
             }
         } 
