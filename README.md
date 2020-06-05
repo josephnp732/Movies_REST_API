@@ -27,6 +27,6 @@
 
 ### Jaeger Tracing Endpoint:
 
-`http://174.138.109.75:16686/` (Not Secured) [Hosted on a DigitalOcean Droplet]
+`http://<JAEGER_AGENT_HOST>:16686/` (Not Secured) [Hosted on a DigitalOcean Droplet]
 
 ### Error Tracking on sentry.io

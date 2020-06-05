@@ -56,7 +56,9 @@ jobs:
           command: |
             cd ./deployment
             terraform apply -var "do_token=${DO_PAT}" -var "pub_key=../id_rsa.pub" -var "pvt_key=../movies_jwt_secret" -var "ssh_fingerprint=${DO_SSH_FINGERPRINT}" --auto-approve
-            terraform output -json fip_output
+            do_fip=$(terraform output -json fip_output | tr -d '"')
+            echo "export JAEGER_AGENT_HOST=$do_fip" >> $BASH_ENV
+            echo "export JAEGER_COLLECTOR_ENDPOINT=http://$do_fip:14268/api/traces" >> $BASH_ENV
       - run:
           name: show
           command: terraform show -no-color > tfresult
