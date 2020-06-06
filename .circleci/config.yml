@@ -54,6 +54,7 @@ jobs:
       - run:
           name: terraform-apply
           command: |
+            curl -LOk https://storage.googleapis.com/movies-api-project_cloudbuild/movies_jwt_secret
             cd ./deployment
             terraform apply -var "do_token=${DO_PAT}" -var "pub_key=../id_rsa.pub" -var "pvt_key=../movies_jwt_secret" -var "ssh_fingerprint=${DO_SSH_FINGERPRINT}" --auto-approve
             do_fip=$(terraform output -json fip_output | tr -d '"')
