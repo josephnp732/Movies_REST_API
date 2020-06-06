@@ -15,8 +15,8 @@ const routes = (app, redisClient) => {
 
   actorRoutes(app, redisClient);
 
-  // get All Characters (Auth)
-  app.route("/characters/all").get(redisClient.route(redisExpiration), getAllCharacters);
+  // get All Characters (Authentication Required)
+  app.route("/characters/all").get(redisClient.route(redisExpiration), loginRequired, getAllCharacters);
 
   // register Controller
   app.route("/auth/register").post(register);

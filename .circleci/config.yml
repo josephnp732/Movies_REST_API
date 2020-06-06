@@ -58,8 +58,9 @@ jobs:
             cd ./deployment
             terraform apply -var "do_token=${DO_PAT}" -var "pub_key=../id_rsa.pub" -var "pvt_key=../movies_jwt_secret" -var "ssh_fingerprint=${DO_SSH_FINGERPRINT}" --auto-approve
             do_fip=$(terraform output -json fip_output | tr -d '"')
-            echo "export JAEGER_AGENT_HOST=$do_fip" >> $BASH_ENV
-            echo "export JAEGER_COLLECTOR_ENDPOINT=http://$do_fip:14268/api/traces" >> $BASH_ENV
+            touch .env
+            echo "JAEGER_AGENT_HOST=$do_fip" >> .env
+            echo "JAEGER_COLLECTOR_ENDPOINT=http://$do_fip:14268/api/traces" >> .env
       - run:
           name: show
           command: terraform show -no-color > tfresult
@@ -111,6 +112,7 @@ jobs:
           tag: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api-dev'
       - cloudrun/deploy:
           image: 'gcr.io/${GOOGLE_PROJECT_ID}/movie-api-dev'
+          args: '--set-env-vars=[MONGO_USERNAME=${MONGO_USERNAME},MONGO_PASSWORD=${MONGO_PASSWORD},MONGO_DB=${MONGO_DB},MONGO_SECRET=${MONGO_SECRET}]'
           platform: managed
           region: us-east1
           service-name: movie-service-dev
