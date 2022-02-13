@@ -18,7 +18,7 @@
   "dependencies": {
     "@elastic/ecs-morgan-format": "^0.2.0",
     "@sentry/node": "^5.15.5",
-    "ajv": "^6.12.2",
+    "ajv": "^6.12.3",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "csurf": "^1.11.0",
